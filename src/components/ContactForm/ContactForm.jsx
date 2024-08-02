@@ -1,22 +1,26 @@
 import { useState } from 'react';
 import { nanoid } from 'nanoid';
-import PropTypes from 'prop-types';
 import css from './ContactForm.module.css';
+// ===========================================
+import { Notify } from 'notiflix';
+import { useDispatch, useSelector } from 'react-redux';
+import { getContacts } from '../../redux/selector';
+import { addContact } from '../../redux/contactsSlice';
 
-export const ContactForm = ({ addNewContact, contacts }) => {
+export const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
 
   //   Get the value of the Input Name and store it in state
   const handleNameChange = e => {
     setName(e.target.value);
-    // console.log(this.state.name);
   };
 
   //   Get the value of the Input Number and store it in state
   const handleNumberChange = e => {
     setNumber(e.target.value);
-    // console.log(this.state.name);
   };
 
   const handleSubmit = e => {
@@ -26,16 +30,25 @@ export const ContactForm = ({ addNewContact, contacts }) => {
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
     if (existingContact) {
-      alert(`${name} is already in contacts!`);
+      Notify.failure(`${name} is already in your contacts!`, {
+        position: 'center-top',
+      });
+      setName('');
+      setNumber('');
       return;
+    } else {
+      Notify.success(`${name} is successfully added to your contacts!`, {
+        position: 'center-top',
+      });
     }
 
-    // Function from the App that pass as Prop.
-    addNewContact({
-      id: nanoid(),
-      name: name,
-      number: number,
-    });
+    dispatch(
+      addContact({
+        id: nanoid(),
+        name: name.trim(),
+        number: number.trim(),
+      })
+    );
 
     setName('');
     setNumber('');
@@ -75,26 +88,4 @@ export const ContactForm = ({ addNewContact, contacts }) => {
       </form>
     </div>
   );
-};
-
-// static propTypes = {
-//   addNewContact: PropTypes.func.isRequired,
-//   contacts: PropTypes.arrayOf(
-//     PropTypes.shape({
-//       id: PropTypes.string.isRequired,
-//       name: PropTypes.string.isRequired,
-//       number: PropTypes.string.isRequired,
-//     })
-//   ),
-// };
-
-ContactForm.prototype = {
-  addNewContact: PropTypes.func.isRequired,
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ),
 };

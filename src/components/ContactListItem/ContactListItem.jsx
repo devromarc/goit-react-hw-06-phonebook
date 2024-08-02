@@ -1,10 +1,19 @@
 import PropTypes from 'prop-types';
 import css from './ContactListItem.module.css';
 
-export const ContactListItem = ({ filteredContact, deleteContact }) => {
-  // handleDelete method
+// ===================
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
+import { useDispatch } from 'react-redux';
+import { deleteContacts } from '../../redux/contactsSlice';
+
+export const ContactListItem = ({ filteredContact }) => {
+  const dispatch = useDispatch();
   const handleDelete = () => {
-    deleteContact(filteredContact.id);
+    dispatch(deleteContacts(filteredContact.id));
+    Notify.success(
+      `${filteredContact.name} was successfully deleted from your contacts!`,
+      { position: 'center-top' }
+    );
   };
 
   return (
@@ -18,5 +27,4 @@ export const ContactListItem = ({ filteredContact, deleteContact }) => {
 
 ContactListItem.propTypes = {
   filteredContact: PropTypes.object.isRequired,
-  deleteContact: PropTypes.func.isRequired,
 };
